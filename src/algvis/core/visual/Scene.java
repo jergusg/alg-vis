@@ -36,70 +36,38 @@ public class Scene extends VisualElement {
     public final Set<VisualElement> elementsToRemove = new HashSet<VisualElement>();
     private final List<VisualElement> temporaryElements = new ArrayList<VisualElement>();
 
+    private int removerCounter = 0;
+    private static final int REMOVER_COUNT = 10;
+
     public Scene() {
         super(0);
         for (int i = 0; i < MAXZ; ++i) {
             elements.add(new HashSet<VisualElement>());
         }
-        initRemoverThread();
     }
 
-    private void initRemoverThread() {
-        // this thread waits until an element ends its animation and then
-        // removes it from the scene
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    synchronized (Scene.this) {
-                        // int poc = 0;
-                        // for(Set<VisualElement> set : elements) poc +=
-                        // set.size();
-                        // System.out.println(elementsToRemove.size());
-                        // System.out.println("elemSIZE: " + poc);
-                        // System.out.println("elemSIZE2: " +
-                        // elements.get(5).size());
-                        final Iterator<VisualElement> iterator = elementsToRemove
-                            .iterator();
-                        while (iterator.hasNext()) {
-                            final VisualElement element = iterator.next();
-                            if (element.isAnimationDone()) {
-                                iterator.remove();
-                                if (element instanceof Node) {
-                                    // System.out.println("removed: " +
-                                    // ((Node) element).getKey());
-                                    // System.out.println("removed: " +
-                                    // element.getZDepth());
-                                    // System.out.println("removed: " +
-                                    // ((Node) element).state);
-                                }
-                                final Set<VisualElement> set = elements
-                                    .get(element.getZDepth());
-                                set.remove(element);
-                            }
-                        }
-                    }
-                    synchronized (this) {
-                        try {
-                            wait(500);
-                        } catch (final InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+    private void removerFunction() {
+        final Iterator<VisualElement> iterator = elementsToRemove.iterator();
+        while (iterator.hasNext()) {
+            final VisualElement element = iterator.next();
+            if (element.isAnimationDone()) {
+                iterator.remove();
+                final Set<VisualElement> set = elements
+                    .get(element.getZDepth());
+                set.remove(element);
             }
-        }).start();
+        }
     }
 
     private Set<VisualElement> elementsAtDepth(int z) {
         return elements.get(z);
     }
 
-    public synchronized void add(VisualElement element) {
+    public void add(VisualElement element) {
         this.add(element, element.getZDepth());
     }
 
-    public synchronized void add(VisualElement element, int zDepth) {
+    public void add(VisualElement element, int zDepth) {
         if (elementsToRemove.contains(element)) {
             elementsToRemove.remove(element);
         }
@@ -112,12 +80,12 @@ public class Scene extends VisualElement {
         elementsAtDepth(zDepth).add(element);
     }
 
-    public synchronized void addUntilNext(VisualElement element) {
+    public void addUntilNext(VisualElement element) {
         this.add(element, element.getZDepth());
         temporaryElements.add(element);
     }
 
-    public synchronized void next() {
+    public void next() {
         for (VisualElement e : temporaryElements) {
             e.endAnimation();
             elementsToRemove.add(e);
@@ -130,7 +98,7 @@ public class Scene extends VisualElement {
      * 
      * @param element
      */
-    public synchronized void remove(VisualElement element) {
+    public void remove(VisualElement element) {
         elementsToRemove.add(element);
     }
 
@@ -139,7 +107,7 @@ public class Scene extends VisualElement {
      * 
      * @param element
      */
-    public synchronized void removeNow(VisualElement element) {
+    public void removeNow(VisualElement element) {
         elements.get(element.getZDepth()).remove(element);
         if (elementsToRemove.contains(element)) {
             elementsToRemove.remove(element);
@@ -152,18 +120,16 @@ public class Scene extends VisualElement {
     @Override
     public void draw(View V) {
         for (int i = MAXZ - 1; i >= 0; --i) {
-            synchronized (this) {
-                for (final VisualElement e : elementsAtDepth(i)) {
-                    e.draw(V);
-                    /*
-                     * // testing bounding boxes
-                     * Rectangle2D r = e.getBoundingBox();
-                     * if (r != null) {
-                     * V.setColor(Color.RED);
-                     * V.drawRectangle(r);
-                     * }
-                     */
-                }
+            for (final VisualElement e : elementsAtDepth(i)) {
+                e.draw(V);
+                /*
+                 * // testing bounding boxes
+                 * Rectangle2D r = e.getBoundingBox();
+                 * if (r != null) {
+                 * V.setColor(Color.RED);
+                 * V.drawRectangle(r);
+                 * }
+                 */
             }
         }
     }
@@ -172,7 +138,12 @@ public class Scene extends VisualElement {
      * Move all elements on the scene.
      */
     @Override
-    public synchronized void move() {
+    public void move() {
+        if (++removerCounter == REMOVER_COUNT) {
+            removerFunction();
+            removerCounter = 0;
+        }
+
         for (final Set<VisualElement> set : elements) {
             for (final VisualElement e : set) {
                 e.move();
@@ -181,7 +152,7 @@ public class Scene extends VisualElement {
     }
 
     @Override
-    public synchronized Rectangle2D getBoundingBox() {
+    public Rectangle2D getBoundingBox() {
         Rectangle2D retVal = null;
         for (final Set<VisualElement> set : elements) {
             for (final VisualElement e : set) {
@@ -197,7 +168,7 @@ public class Scene extends VisualElement {
     }
 
     @Override
-    public synchronized void endAnimation() {
+    public void endAnimation() {
         for (final Set<VisualElement> set : elements) {
             for (final VisualElement e : set) {
                 e.endAnimation();
@@ -206,7 +177,7 @@ public class Scene extends VisualElement {
     }
 
     @Override
-    public synchronized boolean isAnimationDone() {
+    public boolean isAnimationDone() {
         for (final Set<VisualElement> set : elements) {
             for (final VisualElement e : set) {
                 if (!e.isAnimationDone()) {
@@ -218,7 +189,7 @@ public class Scene extends VisualElement {
     }
 
     @Override
-    public synchronized void storeState(Hashtable<Object, Object> state) {
+    public void storeState(Hashtable<Object, Object> state) {
         /*
          * TODO: the code below is soo uggly and inefficient...
          * we would better like sth. like this:
@@ -254,7 +225,7 @@ public class Scene extends VisualElement {
     }
 
     @Override
-    public synchronized void restoreState(Hashtable<?, ?> state) {
+    public void restoreState(Hashtable<?, ?> state) {
         for (int i = 0; i < MAXZ; ++i) {
             final Set<VisualElement> setI = (Set<VisualElement>) state.get(hash
                 + "elements" + i);
@@ -283,10 +254,8 @@ public class Scene extends VisualElement {
         }
     }
 
-    public synchronized void clear() {
-        for (final VisualElement e : elementsToRemove) {
-            elementsToRemove.remove(e);
-        }
+    public void clear() {
+        elementsToRemove.clear();
         for (final Set<VisualElement> set : elements) {
             set.clear();
         }
