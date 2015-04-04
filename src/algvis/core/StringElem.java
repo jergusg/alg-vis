@@ -26,7 +26,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import javax.swing.undo.StateEditable;
+import algvis.core.undo.StateEditable;
 
 public class StringElem implements StateEditable {
     private static final int span = 12;

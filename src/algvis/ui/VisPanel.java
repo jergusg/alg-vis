@@ -36,7 +36,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
-import javax.swing.undo.StateEditable;
+import algvis.core.undo.StateEditable;
 
 public abstract class VisPanel extends JPanel implements LanguageListener,
     StateEditable {

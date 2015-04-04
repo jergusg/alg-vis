@@ -37,7 +37,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.StyleSheet;
-import javax.swing.undo.StateEditable;
+import algvis.core.undo.StateEditable;
 
 import algvis.core.StringUtils;
 import algvis.core.history.HashtableStoreSupport;

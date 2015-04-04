@@ -25,7 +25,7 @@ import java.awt.BorderLayout;
 import java.util.Hashtable;
 
 import javax.swing.JPanel;
-import javax.swing.undo.StateEditable;
+import algvis.core.undo.StateEditable;
 
 public abstract class NewVisPanel extends VisPanel implements LanguageListener,
     StateEditable {

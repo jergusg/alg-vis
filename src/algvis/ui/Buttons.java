@@ -29,7 +29,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.undo.StateEditable;
+import algvis.core.undo.StateEditable;
 
 import algvis.core.Algorithm;
 import algvis.core.DataStructure;
