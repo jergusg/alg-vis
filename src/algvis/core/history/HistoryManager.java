@@ -22,9 +22,9 @@ import algvis.core.visual.Scene;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.UndoableEdit;
+import algvis.core.undo.AbstractUndoableEdit;
+import algvis.core.undo.UndoManager;
+import algvis.core.undo.UndoableEdit;
 
 public class HistoryManager extends UndoManager {
     private static final long serialVersionUID = -842354204488084104L;

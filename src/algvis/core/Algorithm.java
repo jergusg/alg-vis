@@ -70,7 +70,6 @@ abstract public class Algorithm implements Runnable {
         begin();
         runAlgorithm();
         end();
-
     }
 
     public abstract void runAlgorithm();

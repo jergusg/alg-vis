@@ -18,8 +18,8 @@
 
 package algvis.core.history;
 
-import javax.swing.undo.StateEdit;
-import javax.swing.undo.StateEditable;
+import algvis.core.undo.StateEdit;
+import algvis.core.undo.StateEditable;
 
 public class UpdatableStateEdit extends StateEdit {
     /**
